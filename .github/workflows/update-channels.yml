@@ -1,0 +1,53 @@
+name: 自动更新渠道
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # 每天午夜（UTC时间）运行
+  workflow_dispatch:      # 允许手动触发
+
+jobs:
+  update:
+    name: 自动更新渠道  # 为任务配置一个名称
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v4
+
+    - name: 设置Python环境
+      uses: actions/setup-python@v5
+      with:
+        python-version: '3.10'
+        cache: 'pip'
+
+    - name: 安装依赖
+      run: |
+        python -m pip install --upgrade pip
+        pip install -r requirements.txt
+
+    - name: 运行更新脚本
+      env:
+        API_BASE_URL: ${{ secrets.API_BASE_URL }}
+        API_ACCESS_TOKEN: ${{ secrets.API_ACCESS_TOKEN }}
+        API_USERNAME: ${{ secrets.API_USERNAME }}
+        API_PASSWORD: ${{ secrets.API_PASSWORD }}
+        CLIENT_TYPE: ${{ vars.CLIENT_TYPE }}
+        DELAY_TIME: ${{ vars.DELAY_TIME }}
+        TARGET_CHANNEL_STATUS: ${{ vars.TARGET_CHANNEL_STATUS }}
+      run: python app.py --auto
+
+    - name: 检查运行状态
+      if: ${{ failure() }}
+      run: |
+        echo "脚本运行失败，请检查日志"
+        exit 1
+
+    - name: 发送成功通知
+      if: ${{ success() }}
+      uses: candies404/Multi-Channel-Notifier@latest
+      with:
+        wpush_key: ${{ secrets.WPUSH_KEY }}
+        wpush_channel: 'wechat'
+        title: "渠道更新成功"
+        content: "自动更新渠道任务已成功完成"
+        hitokoto: false  # 设置 hitokoto 为 false
