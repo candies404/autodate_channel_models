@@ -13,6 +13,13 @@
 - 可调节的更新延迟时间
 - 支持多种客户端类型
 
+## 运行截图
+### 不带 -- auto 参数 
+![image](https://github.com/user-attachments/assets/4416004c-1029-47b2-96da-3994f7866603)
+### 带 -- atuo 参数 会自动打码关键信息
+![image](https://github.com/user-attachments/assets/9897a20c-e5be-4492-9e54-68d3f1bd1419)
+
+
 ## 安装说明
 
 1. 克隆仓库到本地：
